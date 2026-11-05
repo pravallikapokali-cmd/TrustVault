@@ -1,12 +1,7 @@
-import os
-from flask import Flask
+from flask import Blueprint
 
-def create_app():
-    app = Flask(_name_)
+main = Blueprint('main', _name_)
 
-    app.config['SECRET_KEY'] = os.environ.get(
-        'SECRET_KEY',
-        'dev-secret-key-change-before-deployment'
-    )
-
-    return app
+@main.route('/')
+def home():
+    return "Welcome to TrustVault - Secure Document Sharing Platform"
