@@ -1,69 +1,27 @@
 import os
-import uuid
+from flask import Flask
+from flask_sqlalchemy import SQLAlchemy
 
-from flask import current_app
-from werkzeug.utils import secure_filename
-from app.models import Document
-ALLOWED_EXTENSIONS = {'pdf', 'png', 'jpg', 'jpeg', 'docx'}
+db = SQLAlchemy()
 
 
-def allowed_file(filename):
-    return (
-        '.' in filename
-        and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+def create_app():
+    app = Flask(_name_)
+
+    app.config['SECRET_KEY'] = os.environ.get(
+        'SECRET_KEY',
+        'trustvault-development-key'
     )
 
+    app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///trustvault.db'
+    app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
-@main.route('/upload', methods=['GET', 'POST'])
-def upload():
-    if 'user_id' not in session:
-        return redirect(url_for('main.login'))
+    db.init_app(app)
 
-    if request.method == 'POST':
-        file = request.files.get('document')
+    with app.app_context():
+        db.create_all()
 
-        if not file or file.filename == '':
-            flash('Please select a document.')
-            return redirect(url_for('main.upload'))
+    from app.routes import main
+    app.register_blueprint(main)
 
-        if not allowed_file(file.filename):
-            flash('File type not allowed.')
-            return redirect(url_for('main.upload'))
-
-        original_name = secure_filename(file.filename)
-
-        if not original_name:
-            flash('Invalid filename.')
-            return redirect(url_for('main.upload'))
-
-        stored_name = f"{uuid.uuid4().hex}_{original_name}"
-        upload_path = os.path.join(
-            current_app.config['UPLOAD_FOLDER'],
-            stored_name
-        )
-
-        try:
-            file.save(upload_path)
-
-            document = Document(
-                filename=stored_name,
-                original_filename=original_name,
-                owner_id=session['user_id']
-            )
-
-            db.session.add(document)
-            db.session.commit()
-
-            flash('Document uploaded successfully!')
-            return redirect(url_for('main.dashboard'))
-
-        except Exception:
-            db.session.rollback()
-
-            if os.path.exists(upload_path):
-                os.remove(upload_path)
-
-            flash('Upload failed. Please try again.')
-            return redirect(url_for('main.upload'))
-
-    return render_template('upload.html')
+    return app
