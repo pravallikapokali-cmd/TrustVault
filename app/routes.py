@@ -82,3 +82,14 @@ def logout():
     session.clear()
     flash('You have been logged out.')
     return redirect(url_for('main.login'))
+
+
+@main.route('/dashboard')
+def dashboard():
+    if 'user_id' not in session:
+        return redirect(url_for('main.login'))
+
+    return render_template(
+        'dashboard.html',
+        username=session.get('username')
+    )
