@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TrustVault - Upload Document</title>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f4f7fb;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+        }
+
+        .upload-box {
+            background: white;
+            padding: 35px;
+            width: 350px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px #00000015;
+            text-align: center;
+        }
+
+        h2 {
+            color: #14213d;
+        }
+
+        p {
+            color: #64748b;
+            margin: 20px 0;
+        }
+
+        input {
+            width: 100%;
+            margin: 20px 0;
+        }
+
+        button {
+            width: 100%;
+            padding: 13px;
+            background: #2563eb;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+
+        a {
+            display: inline-block;
+            margin-top: 20px;
+            color: #2563eb;
+            text-decoration: none;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="upload-box">
+
+        <h2> TrustVault</h2>
+        <h3>Upload Your Document</h3>
+
+        <p>Select a document to upload securely.</p>
+
+        {% with messages = get_flashed_messages() %}
+            {% for message in messages %}
+                <p>{{ message }}</p>
+            {% endfor %}
+        {% endwith %}
+
+        <form action="/upload" method="POST"
+              enctype="multipart/form-data">
+
+            <input type="file" name="document" required>
+
+            <button type="submit">Upload Document</button>
+
+        </form>
+
+        <a href="/dashboard">Back to Dashboard</a>
+
+    </div>
+
+</body>
+</html>
