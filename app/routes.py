@@ -10,7 +10,7 @@ from werkzeug.utils import secure_filename
 
 from app import db
 from app.models import User, Document, AuditLog
-
+from app.models import User, Document, DocumentAccess, AuditLog
 main = Blueprint('main', _name_)
 
 
@@ -218,4 +218,73 @@ def download_document(document_id):
     return render_template(
         'documents.html',
         documents=user_documents
+    )
+# Share Document
+@main.route('/share/<int:document_id>', methods=['GET', 'POST'])
+def share_document(document_id):
+
+    if 'user_id' not in session:
+        return redirect(url_for('main.login'))
+
+    document = Document.query.get_or_404(document_id)
+
+    user_id = session['user_id']
+    current_user = User.query.get(user_id)
+
+    # Only owner or admin can share
+    if document.owner_id != user_id and (
+        not current_user or current_user.role != 'admin'
+    ):
+        abort(403)
+
+    if request.method == 'POST':
+        email = request.form.get('email', '').strip().lower()
+        permission = request.form.get('permission', 'view')
+
+        if permission not in ['view', 'download', 'edit']:
+            abort(400)
+
+        target_user = User.query.filter_by(email=email).first()
+
+        if not target_user:
+            flash('User not found.')
+            return redirect(
+                url_for('main.share_document',
+                        document_id=document.id)
+            )
+
+        if target_user.id == user_id:
+            flash('You already own this document.')
+            return redirect(url_for('main.documents'))
+
+        access = DocumentAccess.query.filter_by(
+            document_id=document.id,
+            user_id=target_user.id
+        ).first()
+
+        if access:
+            access.permission = permission
+        else:
+            access = DocumentAccess(
+                document_id=document.id,
+                user_id=target_user.id,
+                permission=permission
+            )
+            db.session.add(access)
+
+        log = AuditLog(
+            document_id=document.id,
+            user_id=user_id,
+            action='Document shared with ' + email
+        )
+
+        db.session.add(log)
+        db.session.commit()
+
+        flash('Document shared successfully!')
+        return redirect(url_for('main.documents'))
+
+    return render_template(
+        'share.html',
+        document=document
     )
