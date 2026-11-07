@@ -163,7 +163,57 @@ def documents():
 
     user_documents = Document.query.filter_by(
         owner_id=session['user_id']
-    ).order_by(Document.uploaded_at.desc()).all()
+    )order_by(Document.uploaded_at.desc()).all()
+# Secure Document Download
+@main.route('/download/<int:document_id>')
+def download_document(document_id):
+
+    if 'user_id' not in session:
+        return redirect(url_for('main.login'))
+
+    document = Document.query.get_or_404(document_id)
+
+    user_id = session['user_id']
+
+    # Check document ownership or admin role
+    user = User.query.get(user_id)
+
+    is_owner = document.owner_id == user_id
+    is_admin = user and user.role == 'admin'
+
+    # Check shared document permission
+    access = DocumentAccess.query.filter_by(
+        document_id=document_id,
+        user_id=user_id
+    ).first()
+
+    has_permission = (
+        access and access.permission in ['view', 'download', 'edit']
+    )
+
+    if not (is_owner or is_admin or has_permission):
+        abort(403)
+
+    # Check whether file exists
+    if not os.path.isfile(document.file_path):
+        abort(404)
+
+    # Record download activity
+    log = AuditLog(
+        document_id=document.id,
+        user_id=user_id,
+        action='Document downloaded'
+    )
+
+    db.session.add(log)
+    db.session.commit()
+
+    return send_file(
+        document.file_path,
+        as_attachment=True,
+        download_name=document.original_filename
+    )
+    
 
     return render_template(
         'documents.html',
