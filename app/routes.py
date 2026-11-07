@@ -1,8 +1,15 @@
+import os
+import uuid
+
 from flask import (
     Blueprint, render_template, request,
     redirect, url_for, flash, session
 )
-from app.models import db, User
+
+from werkzeug.utils import secure_filename
+
+from app import db
+from app.models import User, Document, AuditLog
 
 main = Blueprint('main', _name_)
 
@@ -82,14 +89,70 @@ def logout():
     session.clear()
     flash('You have been logged out.')
     return redirect(url_for('main.login'))
-
-
-@main.route('/dashboard')
-def dashboard():
+# Document Upload
+@main.route('/upload', methods=['GET', 'POST'])
+def upload():
     if 'user_id' not in session:
         return redirect(url_for('main.login'))
 
-    return render_template(
-        'dashboard.html',
-        username=session.get('username')
-    )
+    if request.method == 'POST':
+        file = request.files.get('document')
+        title = request.form.get('title', '').strip()
+        description = request.form.get('description', '').strip()
+
+        if not file or file.filename == '':
+            flash('Please select a file.')
+            return redirect(url_for('main.upload'))
+
+        if not title:
+            flash('Please enter document title.')
+            return redirect(url_for('main.upload'))
+
+        filename = secure_filename(file.filename)
+        allowed = {'pdf', 'doc', 'docx', 'txt', 'png', 'jpg', 'jpeg'}
+
+        if '.' not in filename or filename.rsplit('.', 1)[1].lower() not in allowed:
+            flash('File type not allowed.')
+            return redirect(url_for('main.upload'))
+
+        if request.content_length and request.content_length > 10 * 1024 * 1024:
+            flash('File size must be below 10 MB.')
+            return redirect(url_for('main.upload'))
+
+        upload_folder = os.path.join(
+            os.path.dirname(os.path.dirname(_file_)),
+            'uploads'
+        )
+        os.makedirs(upload_folder, exist_ok=True)
+
+        stored_filename = str(uuid.uuid4()) + '_' + filename
+        file_path = os.path.join(upload_folder, stored_filename)
+
+        file.save(file_path)
+
+        document = Document(
+            title=title,
+            original_filename=filename,
+            stored_filename=stored_filename,
+            file_path=file_path,
+            description=description,
+            owner_id=session['user_id']
+        )
+
+        db.session.add(document)
+        db.session.flush()
+
+        log = AuditLog(
+            document_id=document.id,
+            user_id=session['user_id'],
+            action='Document uploaded'
+        )
+
+        db.session.add(log)
+        db.session.commit()
+
+        flash('Document uploaded successfully!')
+        return redirect(url_for('main.dashboard'))
+
+    return render_template('upload.html')
+
