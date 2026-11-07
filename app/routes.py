@@ -288,3 +288,23 @@ def share_document(document_id):
         'share.html',
         document=document
     )
+# Audit Trail
+@main.route('/audit-logs')
+def audit_logs():
+
+    if 'user_id' not in session:
+        return redirect(url_for('main.login'))
+
+    current_user = User.query.get(session['user_id'])
+
+    if not current_user or current_user.role != 'admin':
+        abort(403)
+
+    logs = AuditLog.query.order_by(
+        AuditLog.timestamp.desc()
+    ).all()
+
+    return render_template(
+        'audit_logs.html',
+        logs=logs
+    )
