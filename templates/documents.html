@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>My Documents - TrustVault</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f2f4f8;
+            padding: 25px;
+        }
+        .container {
+            max-width: 800px;
+            margin: auto;
+            background: white;
+            padding: 25px;
+            border-radius: 12px;
+        }
+        h2 {
+            color: #243b64;
+        }
+        .document {
+            padding: 15px;
+            border-bottom: 1px solid #ddd;
+        }
+        .button {
+            display: inline-block;
+            padding: 10px 15px;
+            background: #243b64;
+            color: white;
+            text-decoration: none;
+            border-radius: 6px;
+            margin-top: 15px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2>TrustVault - My Documents</h2>
+
+    {% if documents %}
+        {% for doc in documents %}
+            <div class="document">
+                <h3>{{ doc.title }}</h3>
+                <p>{{ doc.original_filename }}</p>
+                <p>{{ doc.description or 'No description' }}</p>
+                <small>Uploaded: {{ doc.uploaded_at }}</small>
+            </div>
+        {% endfor %}
+    {% else %}
+        <p>No documents uploaded yet.</p>
+    {% endif %}
+
+    <a class="button" href="{{ url_for('main.upload') }}">
+        Upload Document
+    </a>
+
+    <a class="button" href="{{ url_for('main.dashboard') }}">
+        Dashboard
+    </a>
+</div>
+
+</body>
+</html>
