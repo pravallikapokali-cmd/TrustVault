@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Share Document - TrustVault</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f2f4f8;
+            padding: 30px;
+        }
+
+        .container {
+            max-width: 500px;
+            margin: 50px auto;
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+
+        h2 {
+            color: #243b64;
+        }
+
+        label {
+            display: block;
+            margin-top: 18px;
+            font-weight: bold;
+        }
+
+        input, select {
+            width: 100%;
+            padding: 12px;
+            margin-top: 8px;
+            box-sizing: border-box;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+        }
+
+        button {
+            width: 100%;
+            padding: 13px;
+            margin-top: 22px;
+            background: #243b64;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+
+        a {
+            display: block;
+            text-align: center;
+            margin-top: 18px;
+            color: #243b64;
+        }
+    </style>
+</head>
+
+<body>
+<div class="container">
+
+    <h2>TrustVault</h2>
+    <h3>Share Document</h3>
+
+    <p>Document: {{ document.title }}</p>
+
+    {% with messages = get_flashed_messages() %}
+        {% for message in messages %}
+            <p>{{ message }}</p>
+        {% endfor %}
+    {% endwith %}
+
+    <form method="POST">
+
+        <label>User Email</label>
+        <input type="email" name="email"
+               placeholder="Enter registered user email"
+               required>
+
+        <label>Permission</label>
+        <select name="permission">
+            <option value="view">View</option>
+            <option value="download">Download</option>
+            <option value="edit">Edit</option>
+        </select>
+
+        <button type="submit">Share Document</button>
+
+    </form>
+
+    <a href="{{ url_for('main.documents') }}">
+        Back to My Documents
+    </a>
+
+</div>
+</body>
+</html>
