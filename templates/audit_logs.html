@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>TrustVault - Audit Trail</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f2f4f8;
+            padding: 25px;
+        }
+        .container {
+            max-width: 950px;
+            margin: auto;
+            background: white;
+            padding: 25px;
+            border-radius: 12px;
+        }
+        h2 {
+            color: #243b64;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        th, td {
+            padding: 12px;
+            border-bottom: 1px solid #ddd;
+            text-align: left;
+        }
+        th {
+            background: #243b64;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+
+    <h2>TrustVault - Audit Trail</h2>
+
+    <table>
+        <tr>
+            <th>User ID</th>
+            <th>Document ID</th>
+            <th>Action</th>
+            <th>Date & Time</th>
+        </tr>
+
+        {% for log in logs %}
+        <tr>
+            <td>{{ log.user_id }}</td>
+            <td>{{ log.document_id or '-' }}</td>
+            <td>{{ log.action }}</td>
+            <td>{{ log.timestamp }}</td>
+        </tr>
+        {% else %}
+        <tr>
+            <td colspan="4">No activity recorded yet.</td>
+        </tr>
+        {% endfor %}
+    </table>
+
+    <a href="{{ url_for('main.dashboard') }}">Back to Dashboard</a>
+
+</div>
+</body>
+</html>
