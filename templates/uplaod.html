@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Upload Document - TrustVault</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f2f4f8;
+            margin: 0;
+            padding: 30px;
+        }
+
+        .container {
+            max-width: 500px;
+            margin: 50px auto;
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+
+        h2 {
+            text-align: center;
+            color: #243b64;
+        }
+
+        label {
+            display: block;
+            margin-top: 18px;
+            font-weight: bold;
+        }
+
+        input, textarea {
+            width: 100%;
+            padding: 12px;
+            margin-top: 8px;
+            box-sizing: border-box;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+        }
+
+        button {
+            width: 100%;
+            padding: 13px;
+            margin-top: 22px;
+            background: #243b64;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background: #162947;
+        }
+
+        a {
+            display: block;
+            text-align: center;
+            margin-top: 18px;
+            color: #243b64;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2>TrustVault</h2>
+    <h3>Upload Document</h3>
+
+    {% with messages = get_flashed_messages() %}
+        {% for message in messages %}
+            <p>{{ message }}</p>
+        {% endfor %}
+    {% endwith %}
+
+    <form action="{{ url_for('main.upload') }}"
+          method="POST"
+          enctype="multipart/form-data">
+
+        <label>Document Title</label>
+        <input type="text" name="title"
+               placeholder="Enter document title" required>
+
+        <label>Description</label>
+        <textarea name="description"
+                  placeholder="Enter description"></textarea>
+
+        <label>Select Document</label>
+        <input type="file" name="document"
+               accept=".pdf,.doc,.docx,.txt,.png,.jpg,.jpeg"
+               required>
+
+        <button type="submit">Upload Document</button>
+    </form>
+
+    <a href="{{ url_for('main.dashboard') }}">
+        Back to Dashboard
+    </a>
+</div>
+
+</body>
+</html>
