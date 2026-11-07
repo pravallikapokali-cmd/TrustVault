@@ -155,4 +155,17 @@ def upload():
         return redirect(url_for('main.dashboard'))
 
     return render_template('upload.html')
+# My Documents
+@main.route('/documents')
+def documents():
+    if 'user_id' not in session:
+        return redirect(url_for('main.login'))
 
+    user_documents = Document.query.filter_by(
+        owner_id=session['user_id']
+    ).order_by(Document.uploaded_at.desc()).all()
+
+    return render_template(
+        'documents.html',
+        documents=user_documents
+    )
