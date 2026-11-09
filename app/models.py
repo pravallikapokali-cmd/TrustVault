@@ -63,3 +63,16 @@ class Document(db.Model):
         'User',
         backref='documents'
     )       
+class DocumentAccess(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    document_id = db.Column(db.Integer, db.ForeignKey('document.id'))
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
+    permission = db.Column(db.String(20), nullable=False)
+
+
+class AuditLog(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    document_id = db.Column(db.Integer, db.ForeignKey('document.id'))
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
+    action = db.Column(db.String(255), nullable=False)
+    timestamp = db.Column(db.DateTime, default=datetime.utcnow)
