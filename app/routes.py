@@ -9,7 +9,6 @@ from flask import (
 from werkzeug.utils import secure_filename
 
 from app import db
-from app.models import User, Document, AuditLog
 from app.models import User, Document, DocumentAccess, AuditLog
 main = Blueprint('main', _name_)
 
