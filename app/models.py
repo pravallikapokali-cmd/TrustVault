@@ -1,15 +1,27 @@
+
 from app import db
 from werkzeug.security import generate_password_hash, check_password_hash
 from datetime import datetime
 
+
 class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
 
-    username = db.Column(db.String(100),nullable=False)
+    username = db.Column(
+        db.String(100),
+        nullable=False
+    )
 
-    email = db.Column(db.String(120),unique=True,nullable=False)
+    email = db.Column(
+        db.String(120),
+        unique=True,
+        nullable=False
+    )
 
-    password_hash = db.Column(db.String(256),nullable=False)
+    password_hash = db.Column(
+        db.String(256),
+        nullable=False
+    )
 
     def set_password(self, password):
         self.password_hash = generate_password_hash(password)
@@ -19,6 +31,8 @@ class User(db.Model):
             self.password_hash,
             password
         )
+
+
 class Document(db.Model):
     id = db.Column(db.Integer, primary_key=True)
 
@@ -46,17 +60,52 @@ class Document(db.Model):
     owner = db.relationship(
         'User',
         backref='documents'
-    )       
+    )
+
+
 class DocumentAccess(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    document_id = db.Column(db.Integer, db.ForeignKey('document.id'))
-    user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
-    permission = db.Column(db.String(20), nullable=False)
+
+    document_id = db.Column(
+        db.Integer,
+        db.ForeignKey('document.id'),
+        nullable=False
+    )
+
+    user_id = db.Column(
+        db.Integer,
+        db.ForeignKey('user.id'),
+        nullable=False
+    )
+
+    permission = db.Column(
+        db.String(20),
+        nullable=False
+    )
 
 
 class AuditLog(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    document_id = db.Column(db.Integer, db.ForeignKey('document.id'))
-    user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
-    action = db.Column(db.String(255), nullable=False)
-    timestamp = db.Column(db.DateTime, default=datetime.utcnow)
+
+    document_id = db.Column(
+        db.Integer,
+        db.ForeignKey('document.id'),
+        nullable=False
+    )
+
+    user_id = db.Column(
+        db.Integer,
+        db.ForeignKey('user.id'),
+        nullable=False
+    )
+
+    action = db.Column(
+        db.String(255),
+        nullable=False
+    )
+
+    timestamp = db.Column(
+        db.DateTime,
+        default=datetime.utcnow
+    )
+
