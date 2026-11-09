@@ -32,9 +32,6 @@ class User(db.Model):
             self.password_hash,
             password
         )
- from datetime import datetime
-
-
 class Document(db.Model):
     id = db.Column(db.Integer, primary_key=True)
 
