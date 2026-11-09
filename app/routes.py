@@ -159,9 +159,10 @@ def documents():
     if 'user_id' not in session:
         return redirect(url_for('main.login'))
 
-    user_documents = Document.query.filter_by(
-        owner_id=session['user_id']
-    )order_by(Document.uploaded_at.desc()).all()
+user_documents = Document.query.filter_by(
+    owner_id=session['user_id']
+).order_by(Document.uploaded_at.desc()).all()
+
 # Secure Document Download
 @main.route('/download/<int:document_id>')
 def download_document(document_id):
